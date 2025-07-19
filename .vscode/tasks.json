@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Start relationship_app Django app",
+			"command": "python manage.py startapp relationship_app",
+			"args": [],
+			"group": "build",
+			"isBackground": false
+		}
+	]
+}
