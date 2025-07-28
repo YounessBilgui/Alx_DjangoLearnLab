@@ -22,8 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure--o(rdd)ew#%(#$7**^dj2e1&bkr(e$3^p6ui=%8y=x=*dxp6tu'
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set to False in production for security
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -42,8 +44,23 @@ INSTALLED_APPS = [
     'relationship_app',
 ]
 
+# Content Security Policy (CSP) - helps prevent XSS attacks
+# Install django-csp and add to INSTALLED_APPS and MIDDLEWARE for best practice
+INSTALLED_APPS += ['csp']
+
 # Custom User Model
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
+
+# --- Security Settings ---
+# Enable browser XSS filter
+SECURE_BROWSER_XSS_FILTER = True
+# Prevent the site from being rendered in a frame (clickjacking protection)
+X_FRAME_OPTIONS = 'DENY'
+# Prevent the browser from guessing content types
+SECURE_CONTENT_TYPE_NOSNIFF = True
+# Ensure cookies are only sent over HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -53,7 +70,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',  # Add CSP middleware for Content Security Policy
 ]
+
+# Example CSP policy: only allow scripts/styles from self
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'",)
+CSP_IMG_SRC = ("'self'", 'data:')
 
 ROOT_URLCONF = 'LibraryProject.urls'
 
