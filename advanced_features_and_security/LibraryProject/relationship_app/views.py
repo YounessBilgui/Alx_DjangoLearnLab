@@ -84,20 +84,22 @@ def member_view(request):
 
 
 # Permission-based views for books
-@permission_required('relationship_app.can_add_book', raise_exception=True)
+
+# Use custom permissions from bookshelf.Book
+@permission_required('bookshelf.can_create', raise_exception=True)
 def add_book(request):
     # Logic to add book
     return render(request, 'relationship_app/add_book.html')
 
 
-@permission_required('relationship_app.can_change_book', raise_exception=True)
+@permission_required('bookshelf.can_edit', raise_exception=True)
 def edit_book(request, book_id):
     # Logic to edit book
     book = get_object_or_404(Book, id=book_id)
     return render(request, 'relationship_app/edit_book.html', {'book': book})
 
 
-@permission_required('relationship_app.can_delete_book', raise_exception=True)
+@permission_required('bookshelf.can_delete', raise_exception=True)
 def delete_book(request, book_id):
     # Logic to delete book
     book = get_object_or_404(Book, id=book_id)
