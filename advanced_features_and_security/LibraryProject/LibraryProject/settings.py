@@ -174,6 +174,9 @@ X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
 SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME type sniffing
 SECURE_BROWSER_XSS_FILTER = True    # Enable browser XSS filter
 
+# If using a proxy/load balancer (e.g., on Heroku, AWS, or with Nginx), set this:
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # --- End of HTTPS and Secure Headers ---
 
 # See deployment documentation for SSL/TLS setup on your web server (e.g., Nginx or Apache)
