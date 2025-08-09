@@ -22,10 +22,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure--o(rdd)ew#%(#$7**^dj2e1&bkr(e$3^p6ui=%8y=x=*dxp6tu'
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
-# Set to False in production for security
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -44,23 +42,8 @@ INSTALLED_APPS = [
     'relationship_app',
 ]
 
-# Content Security Policy (CSP) - helps prevent XSS attacks
-# Install django-csp and add to INSTALLED_APPS and MIDDLEWARE for best practice
-INSTALLED_APPS += ['csp']
-
 # Custom User Model
-AUTH_USER_MODEL = 'bookshelf.CustomUser'
-
-# --- Security Settings ---
-# Enable browser XSS filter
-SECURE_BROWSER_XSS_FILTER = True
-# Prevent the site from being rendered in a frame (clickjacking protection)
-X_FRAME_OPTIONS = 'DENY'
-# Prevent the browser from guessing content types
-SECURE_CONTENT_TYPE_NOSNIFF = True
-# Ensure cookies are only sent over HTTPS
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -70,14 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'csp.middleware.CSPMiddleware',  # Add CSP middleware for Content Security Policy
 ]
-
-# Example CSP policy: only allow scripts/styles from self
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = ("'self'",)
-CSP_STYLE_SRC = ("'self'",)
-CSP_IMG_SRC = ("'self'", 'data:')
 
 ROOT_URLCONF = 'LibraryProject.urls'
 
@@ -155,29 +131,3 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# --- HTTPS and Secure Headers ---
-# Redirect all HTTP requests to HTTPS
-SECURE_SSL_REDIRECT = True  # Enforce HTTPS for all requests
-
-# HTTP Strict Transport Security (HSTS)
-SECURE_HSTS_SECONDS = 31536000  # 1 year
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-
-# Secure cookies (already set above, but documented here for clarity)
-SESSION_COOKIE_SECURE = True  # Only send session cookies over HTTPS
-CSRF_COOKIE_SECURE = True     # Only send CSRF cookies over HTTPS
-
-# Secure headers (already set above, but documented here for clarity)
-X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
-SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME type sniffing
-SECURE_BROWSER_XSS_FILTER = True    # Enable browser XSS filter
-
-# If using a proxy/load balancer (e.g., on Heroku, AWS, or with Nginx), set this:
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# --- End of HTTPS and Secure Headers ---
-
-# See deployment documentation for SSL/TLS setup on your web server (e.g., Nginx or Apache)
-# Example: https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/#https
