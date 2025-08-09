@@ -65,6 +65,7 @@ class BookUpdateView(generics.UpdateAPIView):
 	serializer_class = BookSerializer
 	permission_classes = [permissions.IsAuthenticated]
 
+
 # BookDeleteView: Delete a book (authenticated users only)
 class BookDeleteView(generics.DestroyAPIView):
 	"""
@@ -75,44 +76,44 @@ class BookDeleteView(generics.DestroyAPIView):
 	serializer_class = BookSerializer
 	permission_classes = [permissions.IsAuthenticated]
 
-	# BookBulkUpdateView: Custom endpoint for bulk update
-	class BookBulkUpdateView(APIView):
-		"""
-		API endpoint to bulk update books.
-		Only authenticated users can access.
-		"""
-		permission_classes = [IsAuthenticated]
+# BookBulkUpdateView: Custom endpoint for bulk update
+class BookBulkUpdateView(APIView):
+	"""
+	API endpoint to bulk update books.
+	Only authenticated users can access.
+	"""
+	permission_classes = [IsAuthenticated]
 
-		def put(self, request):
-			updates = request.data.get('updates', [])
-			updated_books = []
-			for update in updates:
-				try:
-					book = Book.objects.get(pk=update['id'])
-					serializer = BookSerializer(book, data=update, partial=True)
-					if serializer.is_valid():
-						serializer.save()
-						updated_books.append(serializer.data)
-				except Book.DoesNotExist:
-					continue
-			return Response({'updated': updated_books}, status=status.HTTP_200_OK)
+	def put(self, request):
+		updates = request.data.get('updates', [])
+		updated_books = []
+		for update in updates:
+			try:
+				book = Book.objects.get(pk=update['id'])
+				serializer = BookSerializer(book, data=update, partial=True)
+				if serializer.is_valid():
+					serializer.save()
+					updated_books.append(serializer.data)
+			except Book.DoesNotExist:
+				continue
+		return Response({'updated': updated_books}, status=status.HTTP_200_OK)
 
-	# BookBulkDeleteView: Custom endpoint for bulk delete
-	class BookBulkDeleteView(APIView):
-		"""
-		API endpoint to bulk delete books.
-		Only authenticated users can access.
-		"""
-		permission_classes = [IsAuthenticated]
+# BookBulkDeleteView: Custom endpoint for bulk delete
+class BookBulkDeleteView(APIView):
+	"""
+	API endpoint to bulk delete books.
+	Only authenticated users can access.
+	"""
+	permission_classes = [IsAuthenticated]
 
-		def delete(self, request):
-			ids = request.data.get('ids', [])
-			deleted = []
-			for book_id in ids:
-				try:
-					book = Book.objects.get(pk=book_id)
-					book.delete()
-					deleted.append(book_id)
-				except Book.DoesNotExist:
-					continue
-			return Response({'deleted': deleted}, status=status.HTTP_200_OK)
+	def delete(self, request):
+		ids = request.data.get('ids', [])
+		deleted = []
+		for book_id in ids:
+			try:
+				book = Book.objects.get(pk=book_id)
+				book.delete()
+				deleted.append(book_id)
+			except Book.DoesNotExist:
+				continue
+		return Response({'deleted': deleted}, status=status.HTTP_200_OK)
