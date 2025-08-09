@@ -1,4 +1,5 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,6 +16,20 @@ class BookListView(generics.ListAPIView):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
 	permission_classes = [permissions.AllowAny]
+	# Enable filtering, searching, and ordering
+	filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+	# Filtering by title, author (id), and publication_year
+	filterset_fields = ['title', 'author', 'publication_year']
+	# Searching by title and author's name (traverse relationship)
+	search_fields = ['title', 'author__name']
+	# Ordering by title and publication_year
+	ordering_fields = ['title', 'publication_year']
+	ordering = ['title']  # Default ordering
+	"""
+	Filtering: /api/books/?title=BookTitle&author=1&publication_year=2020
+	Searching: /api/books/?search=SomeText
+	Ordering:  /api/books/?ordering=title or /api/books/?ordering=-publication_year
+	"""
 
 # BookDetailView: Retrieve a single book by ID (read-only for unauthenticated users)
 class BookDetailView(generics.RetrieveAPIView):
