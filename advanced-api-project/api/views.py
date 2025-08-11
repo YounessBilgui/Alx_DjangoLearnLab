@@ -42,7 +42,13 @@ class BookDetailView(generics.RetrieveAPIView):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
 	permission_classes = [permissions.AllowAny]
-
+	"""
+	API endpoint to retrieve a single book by its ID.
+	Accessible to all users (read-only).
+	"""
+	queryset = Book.objects.all()
+	serializer_class = BookSerializer
+	permission_classes = [permissions.AllowAny]
 # BookCreateView: Create a new book (authenticated users only)
 class BookCreateView(generics.CreateAPIView):
 	"""
@@ -53,7 +59,14 @@ class BookCreateView(generics.CreateAPIView):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
 	permission_classes = [permissions.IsAuthenticated]
-
+	"""
+	API endpoint to create a new book.
+	Only authenticated users can create books.
+	Custom validation is handled by BookSerializer.
+	"""
+	queryset = Book.objects.all()
+	serializer_class = BookSerializer
+	permission_classes = [permissions.IsAuthenticated]
 # BookUpdateView: Update an existing book (authenticated users only)
 class BookUpdateView(generics.UpdateAPIView):
 	"""
@@ -64,7 +77,14 @@ class BookUpdateView(generics.UpdateAPIView):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
 	permission_classes = [permissions.IsAuthenticated]
-
+	"""
+	API endpoint to update an existing book.
+	Only authenticated users can update books.
+	Custom validation is handled by BookSerializer.
+	"""
+	queryset = Book.objects.all()
+	serializer_class = BookSerializer
+	permission_classes = [permissions.IsAuthenticated]
 
 # BookDeleteView: Delete a book (authenticated users only)
 class BookDeleteView(generics.DestroyAPIView):
@@ -75,7 +95,13 @@ class BookDeleteView(generics.DestroyAPIView):
 	queryset = Book.objects.all()
 	serializer_class = BookSerializer
 	permission_classes = [permissions.IsAuthenticated]
-
+	"""
+	API endpoint to delete a book.
+	Only authenticated users can delete books.
+	"""
+	queryset = Book.objects.all()
+	serializer_class = BookSerializer
+	permission_classes = [permissions.IsAuthenticated]
 # BookBulkUpdateView: Custom endpoint for bulk update
 class BookBulkUpdateView(APIView):
 	"""
@@ -83,7 +109,26 @@ class BookBulkUpdateView(APIView):
 	Only authenticated users can access.
 	"""
 	permission_classes = [IsAuthenticated]
+	"""
+	API endpoint to bulk update books.
+	Only authenticated users can access.
+	Expects a list of book dicts with id and fields to update.
+	"""
+	permission_classes = [IsAuthenticated]
 
+	def put(self, request):
+		updates = request.data.get('updates', [])
+		updated_books = []
+		for update in updates:
+			try:
+				book = Book.objects.get(pk=update['id'])
+				serializer = BookSerializer(book, data=update, partial=True)
+				if serializer.is_valid():
+					serializer.save()
+					updated_books.append(serializer.data)
+			except Book.DoesNotExist:
+				continue
+		return Response({'updated': updated_books}, status=status.HTTP_200_OK)
 	def put(self, request):
 		updates = request.data.get('updates', [])
 		updated_books = []
@@ -105,7 +150,24 @@ class BookBulkDeleteView(APIView):
 	Only authenticated users can access.
 	"""
 	permission_classes = [IsAuthenticated]
+	"""
+	API endpoint to bulk delete books.
+	Only authenticated users can access.
+	Expects a list of book ids to delete.
+	"""
+	permission_classes = [IsAuthenticated]
 
+	def delete(self, request):
+		ids = request.data.get('ids', [])
+		deleted = []
+		for book_id in ids:
+			try:
+				book = Book.objects.get(pk=book_id)
+				book.delete()
+				deleted.append(book_id)
+			except Book.DoesNotExist:
+				continue
+		return Response({'deleted': deleted}, status=status.HTTP_200_OK)
 	def delete(self, request):
 		ids = request.data.get('ids', [])
 		deleted = []
