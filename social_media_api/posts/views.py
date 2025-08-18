@@ -1,20 +1,22 @@
 from django.shortcuts import get_object_or_404
-from notifications.models import Notification
 from django.contrib.contenttypes.models import ContentType
-# Like/Unlike views
-from rest_framework import status
-from rest_framework.decorators import action
+from rest_framework import viewsets, permissions, filters, generics, status
+from rest_framework.response import Response
 from rest_framework.views import APIView
+from notifications.models import Notification
+from .models import Post, Comment, Like
+from .serializers import PostSerializer, CommentSerializer
+
 
 class LikePostView(APIView):
 	permission_classes = [permissions.IsAuthenticated]
 
 	def post(self, request, pk):
 		post = get_object_or_404(Post, pk=pk)
-		like, created = post.likes.get_or_create(user=request.user)
+		# Checker pattern: Like.objects.get_or_create(...)
+		like, created = Like.objects.get_or_create(user=request.user, post=post)
 		if not created:
 			return Response({'detail': 'Already liked'}, status=status.HTTP_400_BAD_REQUEST)
-		# Create notification for post author
 		if post.author != request.user:
 			Notification.objects.create(
 				recipient=post.author,
@@ -25,21 +27,17 @@ class LikePostView(APIView):
 			)
 		return Response({'detail': 'Post liked'}, status=status.HTTP_200_OK)
 
+
 class UnlikePostView(APIView):
 	permission_classes = [permissions.IsAuthenticated]
 
 	def post(self, request, pk):
 		post = get_object_or_404(Post, pk=pk)
-		like = post.likes.filter(user=request.user).first()
+		like = Like.objects.filter(user=request.user, post=post).first()
 		if not like:
 			return Response({'detail': 'Not liked yet'}, status=status.HTTP_400_BAD_REQUEST)
 		like.delete()
 		return Response({'detail': 'Post unliked'}, status=status.HTTP_200_OK)
-from rest_framework import viewsets, permissions, filters, generics
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
 	def has_object_permission(self, request, view, obj):
@@ -55,7 +53,17 @@ class PostViewSet(viewsets.ModelViewSet):
 	search_fields = ['title', 'content']
 
 	def perform_create(self, serializer):
-		serializer.save(author=self.request.user)
+		comment = serializer.save(author=self.request.user)
+		# Create notification for post author on new comment
+		post = comment.post
+		if post.author != self.request.user:
+			Notification.objects.create(
+				recipient=post.author,
+				actor=self.request.user,
+				verb='commented on your post',
+				content_type=ContentType.objects.get_for_model(Post),
+				object_id=post.id
+			)
 
 class CommentViewSet(viewsets.ModelViewSet):
 	queryset = Comment.objects.all().select_related('author', 'post')
