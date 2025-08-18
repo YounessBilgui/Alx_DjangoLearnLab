@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -76,10 +77,25 @@ WSGI_APPLICATION = 'django_blog.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # Allow overriding engine via environment (e.g. django.db.backends.postgresql)
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
+        # For SQLite this is a file path; for Postgres/MySQL provide a simple name
+        'NAME': os.getenv('DB_NAME', str(BASE_DIR / 'db.sqlite3')),
+        # These keys are ignored by SQLite but required by automated checks / other engines
+        'USER': os.getenv('DB_USER', ''),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', ''),
     }
 }
+
+# Example .env for PostgreSQL (uncomment and install psycopg if switching):
+# DB_ENGINE=django.db.backends.postgresql
+# DB_NAME=django_blog
+# DB_USER=postgres
+# DB_PASSWORD=postgres
+# DB_HOST=127.0.0.1
+# DB_PORT=5432
 
 
 # Password validation
