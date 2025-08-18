@@ -36,7 +36,11 @@ class PostSearchView(ListView):
 		qs = super().get_queryset()
 		q = self.request.GET.get('q')
 		if q:
-			return qs.filter(Q(title__icontains=q) | Q(content__icontains=q)).distinct()
+			return qs.filter(
+				Q(title__icontains=q) |
+				Q(content__icontains=q) |
+				Q(tags__name__icontains=q)
+			).distinct()
 		return qs.none()
 
 	def get_context_data(self, **kwargs):

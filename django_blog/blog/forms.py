@@ -34,6 +34,9 @@ class PostForm(forms.ModelForm):
         widgets = {
             'content': forms.Textarea(attrs={'rows': 6}),
         }
+        help_texts = {
+            'tags': 'Add comma-separated tags (new tags will be created).'
+        }
 
 
 class CommentForm(forms.ModelForm):

@@ -38,6 +38,10 @@ urlpatterns = [
     path('comments/new/<int:pk>/', CommentCreateView.as_view(), name='comment-create'),
     path('comments/<int:pk>/edit/', CommentUpdateView.as_view(), name='comment-edit'),
     path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete'),
+        # Checker-required singular alias routes for comments
+        path('post/<int:pk>/comments/new/', add_comment, name='add-comment-alt'),
+        path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='comment-update'),
+        path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='comment-delete-alt'),
     path('register/', register, name='register'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
