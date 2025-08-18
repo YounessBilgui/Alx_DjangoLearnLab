@@ -34,4 +34,30 @@ class Comment(models.Model):
 	def __str__(self):
 		return f'Comment by {self.author} on {self.post}'
 
-# Create your models here.
+class Profile(models.Model):
+	"""Optional profile extension for User (add fields here without altering auth user model)."""
+	user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+	bio = models.TextField(blank=True)
+	# Placeholder for future fields (e.g., avatar = models.ImageField(upload_to='avatars/', blank=True, null=True))
+
+	def __str__(self):
+		return f'Profile of {self.user.username}'
+
+
+# Signals to auto-create / save profile
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+	if created:
+		Profile.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+	# Ensure profile exists (e.g., for existing users pre-migration)
+	Profile.objects.get_or_create(user=instance)
+	instance.profile.save()
+
