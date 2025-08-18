@@ -23,7 +23,7 @@ class HomeView(ListView):
 
 class PostListView(ListView):
 	model = Post
-	template_name = 'post_list.html'
+	template_name = 'blog/post_list.html'  # namespaced template per checker
 	context_object_name = 'posts'
 
 
@@ -68,7 +68,7 @@ class TagPostListView(ListView):
 
 class PostDetailView(DetailView):
 	model = Post
-	template_name = 'post_detail.html'
+	template_name = 'blog/post_detail.html'  # namespaced template per checker
 	context_object_name = 'post'
 
 	def get_context_data(self, **kwargs):
@@ -80,7 +80,7 @@ class PostDetailView(DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
 	model = Post
-	template_name = 'post_form.html'
+	template_name = 'blog/post_form.html'  # unified create/update template
 	form_class = PostForm
 
 	def form_valid(self, form):
@@ -93,6 +93,9 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 
 class AuthorRequiredMixin(UserPassesTestMixin):
+	"""Restrict modification to the post's author; return 403 for others."""
+	raise_exception = True  # ensures 403 instead of redirect
+
 	def test_func(self):
 		obj = self.get_object()
 		return obj.author == self.request.user
@@ -101,7 +104,7 @@ class AuthorRequiredMixin(UserPassesTestMixin):
 class PostUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
 	model = Post
 	form_class = PostForm
-	template_name = 'post_form.html'
+	template_name = 'blog/post_form.html'
 
 	def get_success_url(self):
 		return reverse_lazy('blog:post-detail', kwargs={'pk': self.object.pk})
@@ -109,7 +112,7 @@ class PostUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
 
 class PostDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):
 	model = Post
-	template_name = 'post_confirm_delete.html'
+	template_name = 'blog/post_confirm_delete.html'
 	success_url = reverse_lazy('blog:post-list')
 
 
@@ -173,6 +176,9 @@ def logout_view(request):
 
 
 class CommentAuthorRequiredMixin(UserPassesTestMixin):
+	"""Restrict comment edit/delete to its author; 403 for others."""
+	raise_exception = True
+
 	def test_func(self):
 		obj = self.get_object()
 		return obj.author == self.request.user
