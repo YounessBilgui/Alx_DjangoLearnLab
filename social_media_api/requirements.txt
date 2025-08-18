@@ -1,0 +1,8 @@
+Django>=5.2.5
+djangorestframework
+djangorestframework-simplejwt
+dj-database-url
+gunicorn
+whitenoise
+psycopg2-binary
+Pillow
