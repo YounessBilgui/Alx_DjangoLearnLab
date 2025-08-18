@@ -1,10 +1,11 @@
+{# Fallback template retained; distinct create/update templates now used (post_create.html, post_update.html) #}
 {% extends 'base.html' %}
-{% block title %}{% if form.instance.pk %}Edit Post{% else %}New Post{% endif %}{% endblock %}
+{% block title %}Post Form{% endblock %}
 {% block content %}
-<h1>{% if form.instance.pk %}Edit Post{% else %}New Post{% endif %}</h1>
+<h1>Post Form</h1>
 <form method="post">
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Save</button>
+  <button type="submit">Submit</button>
 </form>
 {% endblock %}

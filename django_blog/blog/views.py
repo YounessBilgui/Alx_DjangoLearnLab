@@ -64,7 +64,7 @@ class PostDetailView(DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
 	model = Post
-	template_name = 'blog/post_form.html'
+	template_name = 'blog/post_create.html'
 	form_class = PostForm
 
 	def form_valid(self, form):
@@ -85,7 +85,7 @@ class AuthorRequiredMixin(UserPassesTestMixin):
 class PostUpdateView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
 	model = Post
 	form_class = PostForm
-	template_name = 'blog/post_form.html'
+	template_name = 'blog/post_update.html'
 
 	def get_success_url(self):
 		return reverse_lazy('blog:post-detail', kwargs={'pk': self.object.pk})
