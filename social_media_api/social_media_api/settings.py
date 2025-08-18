@@ -1,3 +1,8 @@
+# Security settings for production
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_SSL_REDIRECT = True
 """
 Django settings for social_media_api project.
 
@@ -25,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Production settings
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'insecure-key')
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+DEBUG = False  # Explicitly set for production compliance; override with env if needed
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Security
