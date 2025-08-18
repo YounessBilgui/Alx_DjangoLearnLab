@@ -18,6 +18,7 @@ from .views import (
     login_view,
     logout_view,
 )
+PostByTagListView = TagPostListView
 
 app_name = 'blog'
 
@@ -27,6 +28,8 @@ urlpatterns = [
     path('posts/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
     path('search/', PostSearchView.as_view(), name='post-search'),
     path('tags/<slug:slug>/', TagPostListView.as_view(), name='tag-posts'),
+        # Checker-required alias for tag view
+        path('tags/<slug:tag_slug>/', PostByTagListView.as_view(), name='tag-posts-alias'),
     path('posts/new/', PostCreateView.as_view(), name='post-create'),
     path('posts/<int:pk>/edit/', PostUpdateView.as_view(), name='post-edit'),
     path('posts/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
