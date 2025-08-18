@@ -110,3 +110,48 @@ class SearchTagTests(TestCase):
 		self.assertContains(resp, 'Django Testing')
 		self.assertNotContains(resp, 'REST Framework')
 
+
+class CommentCrudTests(TestCase):
+	def setUp(self):
+		from django.contrib.auth import get_user_model
+		from .models import Post
+		self.User = get_user_model()
+		self.author = self.User.objects.create_user(username='author', password='StrongPass12345')
+		self.other = self.User.objects.create_user(username='other', password='StrongPass12345')
+		self.post = Post.objects.create(title='P', content='C', author=self.author)
+
+	def test_add_comment(self):
+		self.client.login(username='author', password='StrongPass12345')
+		resp = self.client.post(f'/posts/{self.post.id}/comments/new/', {'content': 'Nice post'})
+		self.assertEqual(resp.status_code, 302)
+		from .models import Comment
+		self.assertTrue(Comment.objects.filter(post=self.post, content='Nice post').exists())
+
+	def test_edit_comment_permission(self):
+		from .models import Comment
+		c = Comment.objects.create(post=self.post, author=self.author, content='Orig')
+		# other cannot edit
+		self.client.login(username='other', password='StrongPass12345')
+		resp = self.client.get(f'/comments/{c.id}/edit/')
+		self.assertEqual(resp.status_code, 403)
+		self.client.logout()
+		# owner edits
+		self.client.login(username='author', password='StrongPass12345')
+		resp = self.client.post(f'/comments/{c.id}/edit/', {'content': 'Changed'})
+		self.assertEqual(resp.status_code, 302)
+		c.refresh_from_db()
+		self.assertEqual(c.content, 'Changed')
+
+	def test_delete_comment_permission(self):
+		from .models import Comment
+		c = Comment.objects.create(post=self.post, author=self.author, content='Delete me')
+		self.client.login(username='other', password='StrongPass12345')
+		resp = self.client.post(f'/comments/{c.id}/delete/')
+		self.assertEqual(resp.status_code, 403)
+		self.client.logout()
+		self.client.login(username='author', password='StrongPass12345')
+		resp = self.client.post(f'/comments/{c.id}/delete/')
+		self.assertEqual(resp.status_code, 302)
+		self.assertFalse(Comment.objects.filter(id=c.id).exists())
+
+

@@ -7,31 +7,31 @@
   <p><small>By {{ post.author }} on {{ post.published_date }}</small></p>
   <p>Tags: {% for tag in post.tags.all %}<a href="/tags/{{ tag.slug }}/">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}{% empty %}No tags{% endfor %}</p>
   {% if user == post.author %}
-    <p><a href="/posts/{{ post.id }}/edit/">Edit</a> | <a href="/posts/{{ post.id }}/delete/">Delete</a></p>
+    <p><a href="/post/{{ post.id }}/update/">Edit</a> | <a href="/post/{{ post.id }}/delete/">Delete</a></p>
   {% endif %}
 </article>
 <section>
   <h2>Comments</h2>
   {% for comment in post.comments.all %}
     <div>
-        <p>{{ comment.content }} - <small>{{ comment.author }} at {{ comment.created_at }}</small>
-        {% if user == comment.author %}
-          | <a href="/comments/{{ comment.id }}/edit/">Edit</a> | <a href="/comments/{{ comment.id }}/delete/">Delete</a>
-        {% endif %}
-        </p>
+      <p>{{ comment.content }} - <small>{{ comment.author }} at {{ comment.created_at }}</small>
+      {% if user == comment.author %}
+        | <a href="/comments/{{ comment.id }}/edit/">Edit</a> | <a href="/comments/{{ comment.id }}/delete/">Delete</a>
+      {% endif %}
+      </p>
     </div>
   {% empty %}
     <p>No comments yet.</p>
   {% endfor %}
 </section>
 {% if user.is_authenticated %}
-  <form action="/posts/{{ post.id }}/comments/new/" method="post">
-    {% csrf_token %}
-    {% if comment_form %}
-      {{ comment_form.as_p }}
-    {% endif %}
-    <button type="submit">Add Comment</button>
-  </form>
+<form action="/posts/{{ post.id }}/comments/new/" method="post">
+  {% csrf_token %}
+  {% if comment_form %}
+    {{ comment_form.as_p }}
+  {% endif %}
+  <button type="submit">Add Comment</button>
+</form>
 {% else %}
 <p><a href="/login/">Login</a> to comment.</p>
 {% endif %}
