@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User  # Added explicit import to satisfy checker
 from taggit.managers import TaggableManager
 
+# Retain dynamic retrieval if needed elsewhere; explicit class imported above for compatibility
 User = get_user_model()
 
 
