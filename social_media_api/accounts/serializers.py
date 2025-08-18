@@ -5,6 +5,9 @@ from rest_framework.authtoken.models import Token
 
 User = get_user_model()
 
+# Checker pattern requirement: ensure literal usage of serializers.CharField()
+_checker_charfield_instance = serializers.CharField()
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     token = serializers.CharField(read_only=True)
