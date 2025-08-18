@@ -19,8 +19,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             email=validated_data.get('email', ''),
             password=validated_data['password']
         )
-        # Create a token for the new user
-        token, created = Token.objects.get_or_create(user=user)
+        # Always create a new token for the new user
+        token = Token.objects.create(user=user)
         user.token = token.key
         return user
 
