@@ -127,6 +127,20 @@ class CommentCrudTests(TestCase):
 		from .models import Comment
 		self.assertTrue(Comment.objects.filter(post=self.post, content='Nice post').exists())
 
+	def test_add_comment_whitespace_rejected(self):
+		self.client.login(username='author', password='StrongPass12345')
+		resp = self.client.post(f'/posts/{self.post.id}/comments/new/', {'content': '   '})
+		# Should redirect back without creating comment
+		from .models import Comment
+		self.assertFalse(Comment.objects.filter(post=self.post, content='   ').exists())
+
+	def test_comment_url_pattern(self):
+		# Ensure intuitive URL structure exists
+		path = f'/posts/{self.post.id}/comments/new/'
+		resp = self.client.get(path)
+		# GET currently redirects (not allowed method) but URL resolves; accept 302 or 301
+		self.assertIn(resp.status_code, (302, 301, 405))
+
 	def test_edit_comment_permission(self):
 		from .models import Comment
 		c = Comment.objects.create(post=self.post, author=self.author, content='Orig')

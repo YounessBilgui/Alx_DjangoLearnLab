@@ -43,3 +43,12 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Write your comment...'}),
         }
+
+    def clean_content(self):
+        content = self.cleaned_data.get('content', '')
+        stripped = content.strip()
+        if not stripped:
+            raise forms.ValidationError("Comment cannot be empty or whitespace only.")
+        if len(stripped) < 3:
+            raise forms.ValidationError("Comment is too short (min 3 characters).")
+        return stripped
