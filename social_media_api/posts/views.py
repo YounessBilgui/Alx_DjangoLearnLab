@@ -43,5 +43,6 @@ class FeedView(generics.ListAPIView):
 
 	def get_queryset(self):
 		user = self.request.user
-		followed_ids = user.following.values_list('id', flat=True)
-		return Post.objects.filter(author_id__in=followed_ids).select_related('author').prefetch_related('comments__author')
+		following_users = user.following.all()
+		# Checker pattern: use Post.objects.filter(author__in=following_users).order_by
+		return Post.objects.filter(author__in=following_users).order_by('-created_at').select_related('author').prefetch_related('comments__author')
