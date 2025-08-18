@@ -1,3 +1,40 @@
+from django.shortcuts import get_object_or_404
+from notifications.models import Notification
+from django.contrib.contenttypes.models import ContentType
+# Like/Unlike views
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.views import APIView
+
+class LikePostView(APIView):
+	permission_classes = [permissions.IsAuthenticated]
+
+	def post(self, request, pk):
+		post = get_object_or_404(Post, pk=pk)
+		like, created = post.likes.get_or_create(user=request.user)
+		if not created:
+			return Response({'detail': 'Already liked'}, status=status.HTTP_400_BAD_REQUEST)
+		# Create notification for post author
+		if post.author != request.user:
+			Notification.objects.create(
+				recipient=post.author,
+				actor=request.user,
+				verb='liked your post',
+				content_type=ContentType.objects.get_for_model(Post),
+				object_id=post.id
+			)
+		return Response({'detail': 'Post liked'}, status=status.HTTP_200_OK)
+
+class UnlikePostView(APIView):
+	permission_classes = [permissions.IsAuthenticated]
+
+	def post(self, request, pk):
+		post = get_object_or_404(Post, pk=pk)
+		like = post.likes.filter(user=request.user).first()
+		if not like:
+			return Response({'detail': 'Not liked yet'}, status=status.HTTP_400_BAD_REQUEST)
+		like.delete()
+		return Response({'detail': 'Post unliked'}, status=status.HTTP_200_OK)
 from rest_framework import viewsets, permissions, filters, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
