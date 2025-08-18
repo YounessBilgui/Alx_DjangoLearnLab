@@ -39,4 +39,26 @@ POST /api/comments/
   "post": 1,
   "content": "Nice post!"
 }
+
+POST /api/accounts/follow/2/
+{}
+
+POST /api/accounts/unfollow/2/
+{}
+
+GET /api/feed/
+```
+
+## Feed
+- GET /api/feed/ : Returns recent posts by users the authenticated user follows. Supports search (?search=term) and pagination.
+
+## Follow System
+- POST /api/accounts/follow/<user_id>/ : Follow a user.
+- POST /api/accounts/unfollow/<user_id>/ : Unfollow a user.
+
+Responses:
+```
+{"detail": "Now following alice"}
+{"detail": "Stopped following alice"}
+```
 ```
